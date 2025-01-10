@@ -46,6 +46,14 @@ import {
 import { LinkStatsChart } from "@/components/link-stats-chart";
 import { Loader } from "@/components/ui/loader"; 
 import SuccessPage from "@/components/success-page";
+import { createClient } from "@/utils/supabase/client";
+
+export interface ClickData {
+  timestamp: Date;
+  is_mobile: boolean;
+  os: string;
+  refferer: string;
+}
 
 export default function LinkShortener() {
   const [longUrl, setLongUrl] = useState("");
@@ -55,11 +63,6 @@ export default function LinkShortener() {
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("shorten");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  interface ClickData {
-    date: string;
-    desktop: number;
-    mobile: number;
-  }
 
   interface UrlHistory {
     id: number;
@@ -77,53 +80,25 @@ export default function LinkShortener() {
 
   const [urlHistory, setUrlHistory] = useState<UrlHistory[] | null>(null);
 
-  // Simulate fetching data
+  const supabase = createClient();
+
   useEffect(() => {
-    setTimeout(() => {
-      setUrlHistory([
-        {
-          id: 1,
-          originalUrl: "https://example.com/very-long-url-1",
-          shortUrl: "https://short.ly/abc123",
-          clicks: { total: 150, desktop: 90, mobile: 60 },
-          createdAt: "2023-05-01",
-          active: true,
-          clickData: [
-            { date: "2023-05-01", desktop: 20, mobile: 10 },
-            { date: "2023-05-02", desktop: 25, mobile: 20 },
-            { date: "2023-05-03", desktop: 15, mobile: 10 },
-            { date: "2023-05-04", desktop: 30, mobile: 20 },
-          ],
-        },
-        {
-          id: 2,
-          originalUrl: "https://example.com/very-long-url-2",
-          shortUrl: "https://short.ly/def456",
-          clicks: { total: 75, desktop: 45, mobile: 30 },
-          createdAt: "2023-05-05",
-          active: true,
-          clickData: [
-            { date: "2023-05-05", desktop: 15, mobile: 5 },
-            { date: "2023-05-06", desktop: 10, mobile: 5 },
-            { date: "2023-05-07", desktop: 20, mobile: 20 },
-          ],
-        },
-        {
-          id: 3,
-          originalUrl: "https://example.com/very-long-url-3",
-          shortUrl: "https://short.ly/ghi789",
-          clicks: { total: 200, desktop: 120, mobile: 80 },
-          createdAt: "2023-05-10",
-          active: false,
-          clickData: [
-            { date: "2023-05-10", desktop: 40, mobile: 40 },
-            { date: "2023-05-11", desktop: 40, mobile: 30 },
-            { date: "2023-05-12", desktop: 40, mobile: 10 },
-          ],
-        },
-      ]);
-    }, 4000); // Simulate a 2-second loading time
-  }, []);
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from("links")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.error("Error fetching data:", error.message);
+      } else {
+        for (const link of data) {
+          link.clickData = await supabase.from("clicks").select("*").eq("linkId", link.id);
+        }
+        setUrlHistory(data);
+      }
+    }
+    fetchData();
+  }, [supabase]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,6 +149,13 @@ export default function LinkShortener() {
     setIsSubmitted(false); // Reset the submission state
   }
 
+  const viewStats = () => {
+    // View stats logic here
+    console.log("Viewing stats");
+    createAnother();
+    setActiveTab("history");
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <motion.div
@@ -183,7 +165,12 @@ export default function LinkShortener() {
         className="w-full max-w-3xl"
       >
         {isSubmitted ? (
-          <SuccessPage shortUrl="https://whatup.dk/auiuhd" onCreateAnother={createAnother} onViewStats={createAnother} originalUrl={longUrl} /> // Show the success page on submission
+          <SuccessPage
+            shortUrl="https://whatup.dk/auiuhd"
+            onCreateAnother={createAnother}
+            onViewStats={viewStats}
+            originalUrl={longUrl}
+          /> // Show the success page on submission
         ) : (
           <Tabs
             value={activeTab}
@@ -219,7 +206,9 @@ export default function LinkShortener() {
                             type="button"
                             size="icon"
                             className="rounded-l-none"
-                            onClick={() => navigator.clipboard.writeText(longUrl)}
+                            onClick={() =>
+                              navigator.clipboard.writeText(longUrl)
+                            }
                           >
                             <Clipboard className="h-4 w-4" />
                           </Button>
@@ -267,7 +256,10 @@ export default function LinkShortener() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="domain" className="flex items-center space-x-2">
+                  <Label
+                    htmlFor="domain"
+                    className="flex items-center space-x-2"
+                  >
                     <Globe className="h-4 w-4 text-primary" />
                     <span>Select Domain</span>
                   </Label>
@@ -290,7 +282,10 @@ export default function LinkShortener() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="expiry" className="flex items-center space-x-2">
+                  <Label
+                    htmlFor="expiry"
+                    className="flex items-center space-x-2"
+                  >
                     <CalendarIcon className="h-4 w-4 text-primary" />
                     <span>Set Expiry Date</span>
                     <span className="text-sm text-muted-foreground">

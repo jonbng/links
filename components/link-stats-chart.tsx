@@ -15,12 +15,7 @@ import {
   ChartLegendContent,
   ChartTooltip,
 } from "@/components/ui/chart";
-
-interface ClickData {
-  date: string;
-  desktop: number;
-  mobile: number;
-}
+import { ClickData } from "@/app/page";
 
 interface LinkStatsChartProps {
   data: ClickData[];
@@ -107,7 +102,7 @@ export function LinkStatsChart({
                 </linearGradient>
               </defs>
               <XAxis
-                dataKey="date"
+                dataKey="timestamp"
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => format(new Date(value), "MMM d")}
