@@ -44,15 +44,14 @@ import {
   Copy,
 } from "lucide-react";
 import { LinkStatsChart } from "@/components/link-stats-chart";
-import { Loader } from "@/components/ui/loader"; 
+import { Loader } from "@/components/ui/loader";
 import SuccessPage from "@/components/success-page";
 import { createClient } from "@/utils/supabase/client";
 
 export interface ClickData {
-  timestamp: Date;
-  is_mobile: boolean;
-  os: string;
-  refferer: string;
+  date: string;
+  mobile: string;
+  desktop: string;
 }
 
 export default function LinkShortener() {
@@ -66,15 +65,17 @@ export default function LinkShortener() {
 
   interface UrlHistory {
     id: number;
-    originalUrl: string;
-    shortUrl: string;
+    original_url: string;
+    short_path: string;
+    short_url: string;
+    domain: string;
     clicks: {
       total: number;
       desktop: number;
       mobile: number;
     };
-    createdAt: string;
-    active: boolean;
+    created_at: string;
+    enabled: boolean;
     clickData: ClickData[];
   }
 
@@ -82,25 +83,85 @@ export default function LinkShortener() {
 
   const supabase = createClient();
 
-  useEffect(() => {
-    async function fetchData() {
-      const { data, error } = await supabase
-        .from("links")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) {
-        console.error("Error fetching data:", error.message);
-      } else {
-        for (const link of data) {
-          link.clickData = await supabase.from("clicks").select("*").eq("linkId", link.id);
-        }
-        setUrlHistory(data);
-      }
+  async function fetchData() {
+    console.log("Starting fetchData...");
+
+    const { data, error } = await supabase
+      .from("links")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching links:", error.message);
+      return;
     }
+
+    console.log("Links fetched:", data);
+
+    const linksWithClicks = await Promise.all(
+      data.map(async (link) => {
+        const short_url =
+          "https://" + link.domain + "/" + link.short_path + "/";
+        console.log(`Fetching clicks for link ID: ${link.id}`);
+        const { data: clickData, error: clickError } = await supabase
+          .from("clicks")
+          .select("*")
+          .eq("link_id", link.id);
+
+        if (clickError) {
+          console.error(
+            `Error fetching clicks for link ${link.id}:`,
+            clickError.message
+          );
+          return { ...link, clicks: { mobile: 0, desktop: 0 }, clickData: [] }; // Fallback
+        }
+
+        console.log(`Fetched clicks for link ID ${link.id}:`, clickData);
+
+        const clicks = {
+          mobile: clickData.filter((click) => click.is_mobile).length,
+          desktop:
+            clickData.length -
+            clickData.filter((click) => click.is_mobile).length,
+          total: clickData.length,
+        };
+
+        console.log("Grouping click data...");
+        let groupedClickData: unknown[] = [];
+        if (clickData.length > 0) {
+          groupedClickData = Object.values(
+            clickData.reduce((acc, click) => {
+              console.log("Processing click:", click);
+              const date = format(new Date(click.timestamp), "yyyy-MM-dd");
+              console.log("calculated date: " + date)
+              if (!acc[date]) {
+                acc[date] = { date, desktop: 0, mobile: 0 };
+              }
+              if (click.is_mobile) {
+                acc[date].mobile += 1;
+              } else {
+                acc[date].desktop += 1;
+              }
+              return acc;
+            }, {} as Record<string, { date: string; desktop: number; mobile: number }>)
+          );
+        }
+        console.log(groupedClickData);
+
+        return { ...link, clickData: groupedClickData, clicks, short_url };
+      })
+    );
+
+    console.log("Finished fetching all data:", linksWithClicks);
+
+    setUrlHistory(linksWithClicks);
+    console.log("Finished loading history");
+  }
+  useEffect(() => {
     fetchData();
   }, [supabase]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission logic here
     console.log({
@@ -110,26 +171,63 @@ export default function LinkShortener() {
       selectedDomain,
       expiryDate,
     });
-    setIsSubmitted(true); // Set the submission state to true
+    const { data, error } = await supabase
+      .from("links")
+      .insert({
+        original_url: longUrl,
+        short_path: customSlug ? customSlug : "",
+        domain: selectedDomain,
+        enabled: true,
+        user_id: (await supabase.auth.getUser()).data.user!.id,
+        expires_at: expiryDate?.toISOString(),
+      })
+      .select()
+      .single();
+    if (!error) {
+      setUrlHistory((prev) => {
+        if (prev === null) return null;
+        return [
+          {
+            ...data,
+            clicks: { total: 0, desktop: 0, mobile: 0 },
+            clickData: [],
+          },
+          ...prev,
+        ];
+      });
+      setIsSubmitted(true); // Set the submission state to true
+      await fetchData();
+    }
   };
 
-  const toggleLinkStatus = (id: number, newStatus: boolean) => {
+  const toggleLinkStatus = async (id: number, newStatus: boolean) => {
     // Toggle link active status logic here
     console.log(`Toggling status for link with id: ${id} to ${newStatus}`);
+    const { error } = await supabase
+      .from("links")
+      .update({ enabled: newStatus })
+      .eq("id", id);
+    if (error) return;
     setUrlHistory((prev) => {
       if (prev === null) return null;
       return prev.map((link) => {
         if (link.id === id) {
-          return { ...link, active: newStatus };
+          return { ...link, enabled: newStatus };
         }
         return link;
       });
     });
   };
 
-  const deleteLink = (id: number) => {
+  const deleteLink = async (id: number) => {
     // Delete link logic here
     console.log(`Deleting link with id: ${id}`);
+    const { error } = await supabase.from("links").delete().eq("id", id);
+    if (error) return;
+    setUrlHistory((prev) => {
+      if (prev === null) return null;
+      return prev.filter((link) => link.id !== id);
+    });
   };
 
   const copyLink = (url: string) => {
@@ -147,14 +245,14 @@ export default function LinkShortener() {
     setSelectedDomain("fedtnok.dk");
     setExpiryDate(undefined);
     setIsSubmitted(false); // Reset the submission state
-  }
+  };
 
   const viewStats = () => {
     // View stats logic here
     console.log("Viewing stats");
     createAnother();
     setActiveTab("history");
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
@@ -345,10 +443,10 @@ export default function LinkShortener() {
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <div className="space-y-1">
                           <CardTitle className="text-lg font-medium text-primary">
-                            {url.shortUrl}
+                            {url.short_url}
                           </CardTitle>
                           <CardDescription className="text-sm text-muted-foreground">
-                            {url.originalUrl}
+                            {url.original_url}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
@@ -357,7 +455,7 @@ export default function LinkShortener() {
                               <TooltipTrigger asChild>
                                 <div className="flex items-center justify-center h-9 w-9 pr-4">
                                   <Switch
-                                    checked={url.active}
+                                    checked={url.enabled}
                                     onCheckedChange={(newStatus) =>
                                       toggleLinkStatus(url.id, newStatus)
                                     }
@@ -366,7 +464,7 @@ export default function LinkShortener() {
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>{url.active ? "Disable" : "Enable"} Link</p>
+                                <p>{url.enabled ? "Disable" : "Enable"} Link</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -376,7 +474,7 @@ export default function LinkShortener() {
                                 <Button
                                   variant="outline"
                                   size="icon"
-                                  onClick={() => copyLink(url.shortUrl)}
+                                  onClick={() => copyLink(url.short_url)}
                                 >
                                   <Copy className="h-4 w-4" />
                                 </Button>
@@ -406,11 +504,13 @@ export default function LinkShortener() {
                       </CardHeader>
                       <CardContent>
                         <div className="w-full mx-auto">
-                          <LinkStatsChart
-                            data={url.clickData}
-                            totalDesktop={url.clicks.desktop}
-                            totalMobile={url.clicks.mobile}
-                          />
+                          {(url.clickData.length > 0 && (
+                            <LinkStatsChart
+                              data={url.clickData}
+                              totalDesktop={url.clicks.desktop}
+                              totalMobile={url.clicks.mobile}
+                            />
+                          )) || <h3>No analytics yet</h3>}
                         </div>
                       </CardContent>
                     </Card>

@@ -102,7 +102,7 @@ export function LinkStatsChart({
                 </linearGradient>
               </defs>
               <XAxis
-                dataKey="timestamp"
+                dataKey="date"
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => format(new Date(value), "MMM d")}
@@ -150,7 +150,6 @@ export function LinkStatsChart({
               <Area
                 type="monotone"
                 dataKey="mobile"
-                stackId="1"
                 stroke="hsl(280 91% 60%)"
                 fill="url(#mobile)"
                 strokeWidth={2}
@@ -158,7 +157,6 @@ export function LinkStatsChart({
               <Area
                 type="monotone"
                 dataKey="desktop"
-                stackId="1"
                 stroke="hsl(217 91% 60%)"
                 fill="url(#desktop)"
                 strokeWidth={2}
