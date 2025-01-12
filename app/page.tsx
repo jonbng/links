@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
@@ -83,7 +83,7 @@ export default function LinkShortener() {
 
   const supabase = createClient();
 
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     console.log("Starting fetchData...");
 
     const { data, error } = await supabase
@@ -133,7 +133,7 @@ export default function LinkShortener() {
             clickData.reduce((acc, click) => {
               console.log("Processing click:", click);
               const date = format(new Date(click.timestamp), "yyyy-MM-dd");
-              console.log("calculated date: " + date)
+              console.log("calculated date: " + date);
               if (!acc[date]) {
                 acc[date] = { date, desktop: 0, mobile: 0 };
               }
@@ -156,7 +156,8 @@ export default function LinkShortener() {
 
     setUrlHistory(linksWithClicks);
     console.log("Finished loading history");
-  }
+  }, [supabase]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -189,6 +190,7 @@ export default function LinkShortener() {
         return [
           {
             ...data,
+            short_url: `https://${data.domain}/${data.short_path}/`,
             clicks: { total: 0, desktop: 0, mobile: 0 },
             clickData: [],
           },
@@ -203,11 +205,6 @@ export default function LinkShortener() {
   const toggleLinkStatus = async (id: number, newStatus: boolean) => {
     // Toggle link active status logic here
     console.log(`Toggling status for link with id: ${id} to ${newStatus}`);
-    const { error } = await supabase
-      .from("links")
-      .update({ enabled: newStatus })
-      .eq("id", id);
-    if (error) return;
     setUrlHistory((prev) => {
       if (prev === null) return null;
       return prev.map((link) => {
@@ -217,17 +214,40 @@ export default function LinkShortener() {
         return link;
       });
     });
+    const { data, error } = await supabase
+      .from("links")
+      .update({ enabled: newStatus })
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) return;
+    setUrlHistory((prev) => {
+      if (prev === null) return null;
+      return prev.map((link) => {
+        if (link.id === id) {
+          return { ...link, enabled: data.enabled };
+        }
+        return link;
+      });
+    });
   };
 
   const deleteLink = async (id: number) => {
     // Delete link logic here
     console.log(`Deleting link with id: ${id}`);
-    const { error } = await supabase.from("links").delete().eq("id", id);
-    if (error) return;
+    const link = urlHistory?.find((link) => link.id === id);
     setUrlHistory((prev) => {
       if (prev === null) return null;
       return prev.filter((link) => link.id !== id);
     });
+    const { error } = await supabase.from("links").delete().eq("id", id);
+    if (error) {
+      console.error("Error deleting link:", error.message);
+      setUrlHistory((prev) => {
+        if (prev === null) return null;
+        return [...prev, link!];
+      });
+    }
   };
 
   const copyLink = (url: string) => {
@@ -259,7 +279,7 @@ export default function LinkShortener() {
       fetchData();
     }, 20000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
@@ -271,7 +291,7 @@ export default function LinkShortener() {
       >
         {isSubmitted ? (
           <SuccessPage
-            shortUrl="https://whatup.dk/auiuhd"
+            shortUrl={urlHistory![0].short_url}
             onCreateAnother={createAnother}
             onViewStats={viewStats}
             originalUrl={longUrl}
