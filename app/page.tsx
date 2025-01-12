@@ -159,7 +159,7 @@ export default function LinkShortener() {
   }
   useEffect(() => {
     fetchData();
-  }, [supabase]);
+  }, [fetchData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -412,7 +412,7 @@ export default function LinkShortener() {
                       <Calendar
                         mode="single"
                         selected={expiryDate}
-                        onSelect={setExpiryDate}
+                        onDayClick={setExpiryDate}
                         initialFocus
                       />
                     </PopoverContent>
