@@ -7,7 +7,7 @@ async function redirectMiddleware(request: NextRequest) {
   const domain = request.nextUrl.host;
   const pathname = request.nextUrl.pathname;
 
-  const { data, error } = await supabase.from("links").select("*").eq("domain", domain).eq("active", true).eq("short_path", pathname.split("/")[1]).single()
+  const { data, error } = await supabase.from("links").select("*").eq("domain", domain).eq("enabled", true).eq("short_path", pathname.split("/")[1]).single()
 
   console.log(data, error)
 
