@@ -9,6 +9,8 @@ async function redirectMiddleware(request: NextRequest) {
 
   const { data, error } = await supabase.from("links").select("*").eq("domain", domain).eq("active", true).eq("short_path", pathname.split("/")[1]).single()
 
+  console.log(data, error)
+
   if (!error && data) {
     return Response.redirect(data.original_url)
   } else {
