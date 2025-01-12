@@ -365,7 +365,7 @@ export default function LinkShortener() {
                   />
                 </div>
 
-                <div className="flex justify-between items-center">
+                {/* <div className="flex justify-between items-center">
                   <Label
                     htmlFor="qrCode"
                     className="flex items-center space-x-2 cursor-pointer"
@@ -378,7 +378,7 @@ export default function LinkShortener() {
                     checked={enableQrCode}
                     onCheckedChange={setEnableQrCode}
                   />
-                </div>
+                </div> */}
 
                 <div className="space-y-2">
                   <Label
