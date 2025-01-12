@@ -12,7 +12,7 @@ async function redirectMiddleware(request: NextRequest) {
   if (!error && data) {
     return Response.redirect(data.original_url)
   } else {
-    return Response.redirect(`${request.nextUrl.host}/`)
+    return Response.redirect(`https://${request.nextUrl.host}/`)
   }
 }
 
