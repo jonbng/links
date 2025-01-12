@@ -254,6 +254,13 @@ export default function LinkShortener() {
     setActiveTab("history");
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData();
+    }, 20000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <motion.div

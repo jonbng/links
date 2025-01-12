@@ -12,14 +12,18 @@ async function redirectMiddleware(request: NextRequest) {
   console.log(data, error)
 
   if (!error && data) {
+    await supabase.from("clicks").insert([{ link_id: data.id, is_mobile: request.headers.get("user-agent")?.includes("Mobile"), referrer: request.headers.get("referer"), user_agent: request.headers.get("user-agent"), os: request.headers.get("user-agent")?.split(") ")[0].split("; ").pop() }])
     return Response.redirect(data.original_url)
   } else {
-    return Response.redirect(`https://${request.nextUrl.host}/`)
+    return Response.redirect(`https://links.arctix.dev/`)
   }
 }
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === '/') {
+    if (request.nextUrl.hostname !== 'links.arctix.dev') {
+      return Response.redirect(`https://links.arctix.dev/`)
+    }
     return await updateSession(request);
   } else {
     return await redirectMiddleware(request);
