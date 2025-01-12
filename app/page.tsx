@@ -345,7 +345,7 @@ export default function LinkShortener() {
                     </TooltipProvider>
                   </div>
                 </div>
-
+{/* 
                 <div className="space-y-2">
                   <Label
                     htmlFor="customSlug"
@@ -363,7 +363,7 @@ export default function LinkShortener() {
                     value={customSlug}
                     onChange={(e) => setCustomSlug(e.target.value)}
                   />
-                </div>
+                </div> */}
 
                 {/* <div className="flex justify-between items-center">
                   <Label
