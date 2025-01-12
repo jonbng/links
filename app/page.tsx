@@ -76,6 +76,7 @@ export default function LinkShortener() {
     };
     created_at: string;
     enabled: boolean;
+    expires_at: string | null;
     clickData: ClickData[];
   }
 
@@ -475,6 +476,11 @@ export default function LinkShortener() {
                           <CardDescription className="text-sm text-muted-foreground">
                             {url.original_url}
                           </CardDescription>
+                          {url.expires_at && (
+                            <CardDescription className="text-sm text-muted-foreground">
+                              Expires on: {format(new Date(url.expires_at), "PPP")}
+                            </CardDescription>
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <TooltipProvider>
