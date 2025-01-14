@@ -313,6 +313,19 @@ export default function LinkShortener() {
     []
   );
 
+  const memoizedSuccessPage = useMemo(
+    () =>
+      urlHistory && urlHistory.length > 0 ? (
+        <SuccessPage
+          shortUrl={urlHistory[0].short_url}
+          onCreateAnother={createAnother}
+          onViewStats={viewStats}
+          originalUrl={longUrl}
+        />
+      ) : null,
+    [urlHistory, createAnother, viewStats, longUrl]
+  );
+
   const tabsContent = useMemo(
     () => (
       <Tabs
@@ -576,16 +589,7 @@ export default function LinkShortener() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <motion.div {...animationProps} className="w-full max-w-3xl">
-        {isSubmitted ? (
-          <SuccessPage
-            shortUrl={urlHistory![0].short_url}
-            onCreateAnother={createAnother}
-            onViewStats={viewStats}
-            originalUrl={longUrl}
-          /> // Show the success page on submission
-        ) : (
-          tabsContent
-        )}
+        {isSubmitted ? memoizedSuccessPage : tabsContent}
       </motion.div>
     </div>
   );
