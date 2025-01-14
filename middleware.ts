@@ -21,7 +21,7 @@ async function redirectMiddleware(request: NextRequest) {
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === '/') {
-    if (request.nextUrl.hostname !== 'links.arctix.dev' && request.nextUrl.hostname !== 'localhost') {
+    if (request.nextUrl.hostname !== 'alfabeta.dk' && request.nextUrl.hostname !== 'localhost') {
       return Response.redirect(`https://alfabeta.dk/`)
     }
     return await updateSession(request);
