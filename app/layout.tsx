@@ -1,23 +1,29 @@
-import "./globals.css"
-import type { Metadata } from "next"
-import { Inter } from 'next/font/google'
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Link Shortener",
   description: "A minimalistic link shortener with advanced features",
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}
+        <link
+          rel="preconnect"
+          href="https://jxjcxtzrqkusoxaqkzff.supabase.co"
+        ></link>
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
-  )
+  );
 }
-

@@ -15,14 +15,14 @@ async function redirectMiddleware(request: NextRequest) {
     await supabase.from("clicks").insert([{ link_id: data.id, is_mobile: request.headers.get("user-agent")?.includes("Mobile"), referrer: request.headers.get("referer"), user_agent: request.headers.get("user-agent"), os: request.headers.get("user-agent")?.split(") ")[0].split("; ").pop() }])
     return Response.redirect(data.original_url)
   } else {
-    return Response.redirect(`https://links.arctix.dev/`)
+    return Response.redirect(`https://alfabeta.dk/`)
   }
 }
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === '/') {
-    if (request.nextUrl.hostname !== 'links.arctix.dev') {
-      return Response.redirect(`https://links.arctix.dev/`)
+    if (request.nextUrl.hostname !== 'links.arctix.dev' && request.nextUrl.hostname !== 'localhost') {
+      return Response.redirect(`https://alfabeta.dk/`)
     }
     return await updateSession(request);
   } else {
@@ -39,6 +39,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
