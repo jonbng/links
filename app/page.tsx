@@ -586,10 +586,15 @@ export default function LinkShortener() {
     ]
   );
 
+  const renderedContent = useMemo(
+    () => (isSubmitted ? memoizedSuccessPage : tabsContent),
+    [isSubmitted, memoizedSuccessPage, tabsContent]
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <motion.div {...animationProps} className="w-full max-w-3xl">
-        {isSubmitted ? memoizedSuccessPage : tabsContent}
+        {renderedContent}
       </motion.div>
     </div>
   );
