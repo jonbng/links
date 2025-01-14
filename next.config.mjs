@@ -7,11 +7,22 @@ const nextConfig = {
   },
   productionBrowserSourceMaps: true,
 };
-const withBundleAnalyzer = NextBundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
 
-export default withBundleAnalyzer(MillionLint.next({
-  enabled: true,
-  rsc: true,
-})(nextConfig));
+let config = {};
+
+const env = process.env.NODE_ENV;
+if (env == "development") {
+  const withBundleAnalyzer = NextBundleAnalyzer({
+    enabled: process.env.ANALYZE === "true",
+  });
+  config = withBundleAnalyzer(
+    MillionLint.next({
+      enabled: true,
+      rsc: true,
+    })(nextConfig)
+  );
+} else {
+  config = nextConfig;
+}
+
+export default config;
