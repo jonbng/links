@@ -12,6 +12,7 @@ import {
 import { Check, Copy, ExternalLink } from "lucide-react";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface SuccessPageProps {
   shortUrl: string;
@@ -33,6 +34,7 @@ export default function SuccessPage({
       if (typeof window !== "undefined" && navigator.clipboard) {
         navigator.clipboard.writeText(shortUrl);
         setCopied(true);
+        toast.success("Copied to clipboard!");
         setTimeout(() => setCopied(false), 2000);
       }
     };

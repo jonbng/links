@@ -49,6 +49,7 @@ import SuccessPage from "@/components/success-page";
 import { createClient } from "@/utils/supabase/client";
 import throttle from "lodash/throttle";
 import { IconDock } from "@/components/IconDock";
+import { toast } from "sonner";
 
 export interface ClickData {
   date: string;
@@ -276,6 +277,7 @@ export default function LinkShortener() {
         navigator.clipboard.writeText(url);
         // You might want to add a toast notification here
         console.log(`Copied to clipboard: ${url}`);
+        toast.success("Link copied to clipboard", { });
       }, 300),
     []
   );

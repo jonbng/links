@@ -2,6 +2,7 @@ import { IconDock } from "@/components/IconDock";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className={inter.className}>
         {children}
         <IconDock />
+        <Toaster richColors />
       </body>
     </html>
   );

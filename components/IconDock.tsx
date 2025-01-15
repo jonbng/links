@@ -17,8 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "./ui/button";
 import Link from "next/link";
 
 export type IconProps = React.ImgHTMLAttributes<HTMLImageElement>;
@@ -34,78 +32,20 @@ export function IconDock() {
           iconSize={85}
           className="border-none bg-transparent top-0 fixed left-0 right-0 z-50"
         >
-          <DockIcon key="link">
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger asChild>
-                <Link href="/" aria-label="Link Shortener">
-                  <Icons.links />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Link Shortener</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
-          <DockIcon key="alarm">
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger asChild>
-                <Link href="/alarm" aria-label="Alarm">
-                  <Icons.alarm />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Alarm</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
-          <DockIcon key="code">
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger asChild>
-                <Link href="/code" aria-label="Code Formatter">
-                  <Icons.code />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Code Formatter</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
-          <DockIcon key="compressor">
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger asChild>
-                <Link href="/compressor" aria-label="Image Compressor">
-                  <Icons.compressor />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Image Compressor</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
-          <DockIcon key="counter">
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger asChild>
-                <Link href="/counter" aria-label="Word Counter">
-                  <Icons.counter />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Word Counter</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
-          <DockIcon key="qr">
-            <Tooltip delayDuration={50}>
-              <TooltipTrigger asChild>
-                <Link href="/qr" aria-label="QR code generator">
-                  <Icons.qr />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>QR code generator</p>
-              </TooltipContent>
-            </Tooltip>
-          </DockIcon>
+          {links.map((link) => (
+            <DockIcon key={link.label}>
+              <Tooltip delayDuration={50}>
+                <TooltipTrigger asChild>
+                  <Link href={link.href} aria-label={link.label}>
+                    {link.icon({})}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{link.label}</p>
+                </TooltipContent>
+              </Tooltip>
+            </DockIcon>
+          ))}
         </Dock>
       </div>
     </TooltipProvider>
@@ -168,3 +108,36 @@ const Icons = {
     />
   ),
 };
+
+const links = [
+  {
+    icon: Icons.links,
+    label: "Link Shortener",
+    href: "/",
+  },
+  {
+    icon: Icons.qr,
+    label: "QR code generator",
+    href: "/qr",
+  },
+  {
+    icon: Icons.alarm,
+    label: "Alarm",
+    href: "/alarm",
+  },
+  {
+    icon: Icons.code,
+    label: "Code Formatter",
+    href: "/code",
+  },
+  {
+    icon: Icons.compressor,
+    label: "Image Compressor",
+    href: "/compressor",
+  },
+  {
+    icon: Icons.counter,
+    label: "Word Counter",
+    href: "/counter",
+  },
+];
