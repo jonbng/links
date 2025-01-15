@@ -48,6 +48,7 @@ import { Loader } from "@/components/ui/loader";
 import SuccessPage from "@/components/success-page";
 import { createClient } from "@/utils/supabase/client";
 import throttle from "lodash/throttle";
+import { IconDock } from "@/components/IconDock";
 
 export interface ClickData {
   date: string;
@@ -59,7 +60,7 @@ export default function LinkShortener() {
   const [longUrl, setLongUrl] = useState("");
   const [customSlug, setCustomSlug] = useState("");
   const [enableQrCode, setEnableQrCode] = useState(false);
-  const [selectedDomain, setSelectedDomain] = useState("alfabeta.dk");
+  const [selectedDomain, setSelectedDomain] = useState("fedtnok.dk");
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("shorten");
   const [isSubmitted, setIsSubmitted] = useState(false);

@@ -1,3 +1,4 @@
+import { IconDock } from "@/components/IconDock";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -23,7 +24,10 @@ export default function RootLayout({
           href="https://jxjcxtzrqkusoxaqkzff.supabase.co"
         ></link>
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <IconDock />
+      </body>
     </html>
   );
 }

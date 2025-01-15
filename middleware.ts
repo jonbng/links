@@ -2,6 +2,8 @@ import { type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 import { createAdminClient } from "./utils/supabase/admin";
 
+const actualLinks = ["/", "/qr", "/alarm", "/code", "/compressor", "/counter", "/countdown", "/link"]
+
 async function redirectMiddleware(request: NextRequest) {
   const supabase = createAdminClient();
   const domain = request.nextUrl.host;
@@ -20,7 +22,7 @@ async function redirectMiddleware(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname === '/') {
+  if (actualLinks.includes(request.nextUrl.pathname)) {
     if (request.nextUrl.hostname !== 'alfabeta.dk' && request.nextUrl.hostname !== 'localhost') {
       return Response.redirect(`https://alfabeta.dk/`)
     }
