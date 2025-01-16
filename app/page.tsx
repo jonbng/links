@@ -56,13 +56,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@radix-ui/react-alert-dialog";
+} from "@/components/ui/alert-dialog";
 
 export interface ClickData {
   date: string;
@@ -78,6 +77,8 @@ export default function LinkShortener() {
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("shorten");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
 
   interface UrlHistory {
     id: number;
@@ -342,36 +343,48 @@ export default function LinkShortener() {
     [urlHistory, createAnother, viewStats, longUrl]
   );
 
+  const handleDeleteClick = (id: number) => {
+    setLinkToDelete(id);
+    setIsDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (linkToDelete !== null) {
+      deleteLink(linkToDelete);
+      setIsDialogOpen(false);
+    }
+  };
+
   const tabsContent = useMemo(
     () => (
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="bg-card p-6 rounded-lg shadow-lg"
-      >
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="shorten">Shorten URL</TabsTrigger>
-          <TabsTrigger value="history">History & Stats</TabsTrigger>
-        </TabsList>
-        <TabsContent value="shorten">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <h1 className="text-3xl font-bold text-center mb-6 text-primary">
-              Link Shortener
-            </h1>
+      <TooltipProvider>
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="bg-card p-6 rounded-lg shadow-lg"
+        >
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="shorten">Shorten URL</TabsTrigger>
+            <TabsTrigger value="history">History & Stats</TabsTrigger>
+          </TabsList>
+          <TabsContent value="shorten">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h1 className="text-3xl font-bold text-center mb-6 text-primary">
+                Link Shortener
+              </h1>
 
-            <div className="space-y-2">
-              <Label htmlFor="longUrl">Enter your long URL</Label>
-              <div className="flex">
-                <Input
-                  id="longUrl"
-                  type="url"
-                  placeholder="https://example.com/very-long-url"
-                  value={longUrl}
-                  onChange={(e) => setLongUrl(e.target.value)}
-                  className="rounded-r-none"
-                  required
-                />
-                <TooltipProvider>
+              <div className="space-y-2">
+                <Label htmlFor="longUrl">Enter your long URL</Label>
+                <div className="flex">
+                  <Input
+                    id="longUrl"
+                    type="url"
+                    placeholder="https://example.com/very-long-url"
+                    value={longUrl}
+                    onChange={(e) => setLongUrl(e.target.value)}
+                    className="rounded-r-none"
+                    required
+                  />
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
@@ -388,136 +401,140 @@ export default function LinkShortener() {
                       <p>Copy URL</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
+                </div>
               </div>
-            </div>
-            {/* 
-          <div className="space-y-2">
-            <Label
-              htmlFor="customSlug"
-              className="flex items-center space-x-2"
-            >
-              <span>Custom short link</span>
-              <span className="text-sm text-muted-foreground">
-                (optional)
-              </span>
-            </Label>
-            <Input
-              id="customSlug"
-              type="text"
-              placeholder="e.g., my-custom-link"
-              value={customSlug}
-              onChange={(e) => setCustomSlug(e.target.value)}
-            />
-          </div> */}
-
-            {/* <div className="flex justify-between items-center">
-          <Label
-            htmlFor="qrCode"
-            className="flex items-center space-x-2 cursor-pointer"
-          >
-            <QrCode className="h-4 w-4 text-primary" />
-            <span>Generate QR Code</span>
-          </Label>
-          <Switch
-            id="qrCode"
-            checked={enableQrCode}
-            onCheckedChange={setEnableQrCode}
-          />
-        </div> */}
-
+              {/* 
             <div className="space-y-2">
-              <Label htmlFor="domain" className="flex items-center space-x-2">
-                <Globe className="h-4 w-4 text-primary" />
-                <span>Select Domain</span>
-              </Label>
-              <Select value={selectedDomain} onValueChange={setSelectedDomain}>
-                <SelectTrigger id="domain" aria-label="Select a domain">
-                  <SelectValue placeholder="Select a domain" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="whatup.dk">whatup.dk</SelectItem>
-                  <SelectItem value="fedtnok.dk">fedtnok.dk</SelectItem>
-                  <SelectItem value="alfabeta.dk">alfabeta.dk</SelectItem>
-                  <SelectItem value="links.arctix.dev">
-                    links.arctix.dev
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="expiry" className="flex items-center space-x-2">
-                <CalendarIcon className="h-4 w-4 text-primary" />
-                <span>Set Expiry Date</span>
+              <Label
+                htmlFor="customSlug"
+                className="flex items-center space-x-2"
+              >
+                <span>Custom short link</span>
                 <span className="text-sm text-muted-foreground">
                   (optional)
                 </span>
               </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="expiry"
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !expiryDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {expiryDate ? (
-                      format(expiryDate, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={expiryDate}
-                    onDayClick={setExpiryDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+              <Input
+                id="customSlug"
+                type="text"
+                placeholder="e.g., my-custom-link"
+                value={customSlug}
+                onChange={(e) => setCustomSlug(e.target.value)}
+              />
+            </div> */}
 
-            <Button type="submit" className="w-full">
-              Shorten URL
-            </Button>
-          </form>
-        </TabsContent>
-        <TabsContent value="history">
-          <h2 className="text-2xl font-bold mb-4">URL History & Statistics</h2>
-          <div className="space-y-8">
-            {urlHistory === null ? (
-              <div className="flex justify-center items-center">
-                <Loader size="large" />
+              {/* <div className="flex justify-between items-center">
+            <Label
+              htmlFor="qrCode"
+              className="flex items-center space-x-2 cursor-pointer"
+            >
+              <QrCode className="h-4 w-4 text-primary" />
+              <span>Generate QR Code</span>
+            </Label>
+            <Switch
+              id="qrCode"
+              checked={enableQrCode}
+              onCheckedChange={setEnableQrCode}
+            />
+          </div> */}
+
+              <div className="space-y-2">
+                <Label htmlFor="domain" className="flex items-center space-x-2">
+                  <Globe className="h-4 w-4 text-primary" />
+                  <span>Select Domain</span>
+                </Label>
+                <Select
+                  value={selectedDomain}
+                  onValueChange={setSelectedDomain}
+                >
+                  <SelectTrigger id="domain" aria-label="Select a domain">
+                    <SelectValue placeholder="Select a domain" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="whatup.dk">whatup.dk</SelectItem>
+                    <SelectItem value="fedtnok.dk">fedtnok.dk</SelectItem>
+                    <SelectItem value="alfabeta.dk">alfabeta.dk</SelectItem>
+                    <SelectItem value="links.arctix.dev">
+                      links.arctix.dev
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            ) : urlHistory.length < 1 ? (
-              <div className="text-center text-muted-foreground">
-                No links have been created yet.
-              </div>
-            ) : (
-              urlHistory.map((url) => (
-                <Card key={url.id} className="bg-secondary">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <div className="space-y-1">
-                      <CardTitle className="text-lg font-medium text-primary">
-                        {url.short_url}
-                      </CardTitle>
-                      <CardDescription className="text-sm text-muted-foreground">
-                        {url.original_url}
-                      </CardDescription>
-                      {url.expires_at && (
-                        <CardDescription className="text-sm text-muted-foreground">
-                          Expires on: {format(new Date(url.expires_at), "PPP")}
-                        </CardDescription>
+
+              <div className="space-y-2">
+                <Label htmlFor="expiry" className="flex items-center space-x-2">
+                  <CalendarIcon className="h-4 w-4 text-primary" />
+                  <span>Set Expiry Date</span>
+                  <span className="text-sm text-muted-foreground">
+                    (optional)
+                  </span>
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="expiry"
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !expiryDate && "text-muted-foreground"
                       )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <TooltipProvider>
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {expiryDate ? (
+                        format(expiryDate, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={expiryDate}
+                      onDayClick={setExpiryDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <Button type="submit" className="w-full">
+                Shorten URL
+              </Button>
+            </form>
+          </TabsContent>
+          <TabsContent value="history">
+            <h2 className="text-2xl font-bold mb-4">
+              URL History & Statistics
+            </h2>
+            <div className="space-y-8">
+              {urlHistory === null ? (
+                <div className="flex justify-center items-center">
+                  <Loader size="large" />
+                </div>
+              ) : urlHistory.length < 1 ? (
+                <div className="text-center text-muted-foreground">
+                  No links have been created yet.
+                </div>
+              ) : (
+                urlHistory.map((url) => (
+                  <Card key={url.id} className="bg-secondary">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <div className="space-y-1">
+                        <CardTitle className="text-lg font-medium text-primary">
+                          {url.short_url}
+                        </CardTitle>
+                        <CardDescription className="text-sm text-muted-foreground">
+                          {url.original_url}
+                        </CardDescription>
+                        {url.expires_at && (
+                          <CardDescription className="text-sm text-muted-foreground">
+                            Expires on:{" "}
+                            {format(new Date(url.expires_at), "PPP")}
+                          </CardDescription>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div className="flex items-center justify-center h-9 w-9 pr-4">
@@ -534,8 +551,6 @@ export default function LinkShortener() {
                             <p>{url.enabled ? "Disable" : "Enable"} Link</p>
                           </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -551,62 +566,40 @@ export default function LinkShortener() {
                             <p>Copy Link</p>
                           </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
                         <Tooltip>
-                          <AlertDialog>
-                            <TooltipTrigger asChild>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="icon">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete link</p>
-                            </TooltipContent>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete your link and remove your
-                                  data from our servers.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => deleteLink(url.id)}
-                                >
-                                  Continue
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleDeleteClick(url.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Delete link</p>
+                          </TooltipContent>
                         </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="w-full mx-auto">
-                      {(url.clickData.length > 0 && (
-                        <LinkStatsChart
-                          data={url.clickData}
-                          totalDesktop={url.clicks.desktop}
-                          totalMobile={url.clicks.mobile}
-                        />
-                      )) || <h3>No analytics yet</h3>}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="w-full mx-auto">
+                        {(url.clickData.length > 0 && (
+                          <LinkStatsChart
+                            data={url.clickData}
+                            totalDesktop={url.clicks.desktop}
+                            totalMobile={url.clicks.mobile}
+                          />
+                        )) || <h3>No analytics yet</h3>}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </TooltipProvider>
     ),
     [
       activeTab,
@@ -618,7 +611,7 @@ export default function LinkShortener() {
       urlHistory,
       toggleLinkStatus,
       copyLink,
-      deleteLink,
+      handleDeleteClick,
     ]
   );
 
@@ -632,6 +625,25 @@ export default function LinkShortener() {
       <motion.div {...animationProps} className="w-full max-w-3xl">
         {renderedContent}
       </motion.div>
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              link and remove your data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
