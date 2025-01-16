@@ -50,6 +50,19 @@ import { createClient } from "@/utils/supabase/client";
 import throttle from "lodash/throttle";
 import { IconDock } from "@/components/IconDock";
 import { toast } from "sonner";
+import {
+  AlertDialogHeader,
+  AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@radix-ui/react-alert-dialog";
 
 export interface ClickData {
   date: string;
@@ -277,7 +290,7 @@ export default function LinkShortener() {
         navigator.clipboard.writeText(url);
         // You might want to add a toast notification here
         console.log(`Copied to clipboard: ${url}`);
-        toast.success("Link copied to clipboard", { });
+        toast.success("Link copied to clipboard", {});
       }, 300),
     []
   );
@@ -541,18 +554,38 @@ export default function LinkShortener() {
                       </TooltipProvider>
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => deleteLink(url.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Delete Link</p>
-                          </TooltipContent>
+                          <AlertDialog>
+                            <TooltipTrigger asChild>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="icon">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete link</p>
+                            </TooltipContent>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will
+                                  permanently delete your link and remove your
+                                  data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteLink(url.id)}
+                                >
+                                  Continue
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
