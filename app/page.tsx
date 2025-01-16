@@ -73,7 +73,7 @@ export default function LinkShortener() {
   const [longUrl, setLongUrl] = useState("");
   const [customSlug, setCustomSlug] = useState("");
   const [enableQrCode, setEnableQrCode] = useState(false);
-  const [selectedDomain, setSelectedDomain] = useState("fedtnok.dk");
+  const [selectedDomain, setSelectedDomain] = useState("alfabeta.dk");
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("shorten");
   const [isSubmitted, setIsSubmitted] = useState(false);

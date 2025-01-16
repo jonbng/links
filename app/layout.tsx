@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Link Shortener",
-  description: "A minimalistic link shortener with advanced features",
+  title: "Alfa Beta",
+  description: "The only online toolbox you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         {children}
-        <IconDock />
+        {process.env.NODE_ENV === "development" && <IconDock />}
         <Toaster richColors />
       </body>
     </html>
