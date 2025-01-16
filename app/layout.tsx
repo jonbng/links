@@ -3,12 +3,14 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import ClientIconUpdater from "./iconupdater";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Alfa Beta",
-  description: "The only online toolbox you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
+  description:
+    "The only online toolbox you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
 };
 
 export default function RootLayout({
@@ -23,9 +25,10 @@ export default function RootLayout({
         <link
           rel="preconnect"
           href="https://jxjcxtzrqkusoxaqkzff.supabase.co"
-        ></link>
+        />
       </head>
       <body className={inter.className}>
+        <ClientIconUpdater />
         {children}
         {process.env.NODE_ENV === "development" && <IconDock />}
         <Toaster richColors />
