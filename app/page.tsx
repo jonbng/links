@@ -313,7 +313,7 @@ export default function LinkShortener() {
     setLongUrl("");
     setCustomSlug("");
     setEnableQrCode(false);
-    setSelectedDomain("fedtnok.dk");
+    setSelectedDomain("alfabeta.dk");
     setExpiryDate(undefined);
     setIsSubmitted(false); // Reset the submission state
   }, []);
@@ -465,6 +465,7 @@ export default function LinkShortener() {
                     <SelectItem value="whatup.dk">whatup.dk</SelectItem>
                     <SelectItem value="fedtnok.dk">fedtnok.dk</SelectItem>
                     <SelectItem value="alfabeta.dk">alfabeta.dk</SelectItem>
+                    <SelectItem value="jonathanb.dk">jonathanb.dk</SelectItem>
                     <SelectItem value="links.arctix.dev">
                       links.arctix.dev
                     </SelectItem>
