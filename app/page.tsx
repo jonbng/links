@@ -206,7 +206,7 @@ export default function LinkShortener() {
     setIsLoading(true);
     await handleSubmit(e);
     setIsLoading(false);
-  }
+  };
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -414,26 +414,24 @@ export default function LinkShortener() {
                   </Tooltip>
                 </div>
               </div>
-              {/* 
-            <div className="space-y-2">
-              <Label
-                htmlFor="customSlug"
-                className="flex items-center space-x-2"
-              >
-                <span>Custom short link</span>
-                <span className="text-sm text-muted-foreground">
-                  (optional)
-                </span>
-              </Label>
-              <Input
-                id="customSlug"
-                type="text"
-                placeholder="e.g., my-custom-link"
-                value={customSlug}
-                onChange={(e) => setCustomSlug(e.target.value)}
-              />
-            </div> */}
-
+              <div className="space-y-2">
+                <Label
+                  htmlFor="customSlug"
+                  className="flex items-center space-x-2"
+                >
+                  <span>Custom short link</span>
+                  <span className="text-sm text-muted-foreground">
+                    (optional)
+                  </span>
+                </Label>
+                <Input
+                  id="customSlug"
+                  type="text"
+                  placeholder="e.g., my-custom-link"
+                  value={customSlug}
+                  onChange={(e) => setCustomSlug(e.target.value)}
+                />
+              </div>
               {/* <div className="flex justify-between items-center">
             <Label
               htmlFor="qrCode"
@@ -651,7 +649,10 @@ export default function LinkShortener() {
             <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className={cn(buttonVariants({ variant: "destructive" }))}>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className={cn(buttonVariants({ variant: "destructive" }))}
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
