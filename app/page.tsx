@@ -288,6 +288,10 @@ export default function LinkShortener() {
           return link;
         });
       });
+      toast.success(
+        `Link ${newStatus ? "enabled" : "disabled"} successfully`,
+        {}
+      );
     },
     [supabase]
   );
