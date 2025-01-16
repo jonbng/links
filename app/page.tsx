@@ -77,6 +77,7 @@ export default function LinkShortener() {
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("shorten");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
 
@@ -200,6 +201,12 @@ export default function LinkShortener() {
     },
     [supabase, urlHistory]
   );
+
+  const betterHandleSubmit = async (e: React.FormEvent) => {
+    setIsLoading(true);
+    await handleSubmit(e);
+    setIsLoading(false);
+  }
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -343,10 +350,10 @@ export default function LinkShortener() {
     [urlHistory, createAnother, viewStats, longUrl]
   );
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = useCallback((id: number) => {
     setLinkToDelete(id);
     setIsDialogOpen(true);
-  };
+  }, []);
 
   const confirmDelete = () => {
     if (linkToDelete !== null) {
@@ -368,7 +375,7 @@ export default function LinkShortener() {
             <TabsTrigger value="history">History & Stats</TabsTrigger>
           </TabsList>
           <TabsContent value="shorten">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={betterHandleSubmit} className="space-y-6">
               <h1 className="text-3xl font-bold text-center mb-6 text-primary">
                 Link Shortener
               </h1>
@@ -498,8 +505,8 @@ export default function LinkShortener() {
                 </Popover>
               </div>
 
-              <Button type="submit" className="w-full">
-                Shorten URL
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Loading..." : "Shorten URL"}
               </Button>
             </form>
           </TabsContent>
@@ -604,7 +611,7 @@ export default function LinkShortener() {
     [
       activeTab,
       setActiveTab,
-      handleSubmit,
+      betterHandleSubmit,
       longUrl,
       selectedDomain,
       expiryDate,
