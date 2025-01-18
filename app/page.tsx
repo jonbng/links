@@ -433,20 +433,19 @@ export default function LinkShortener() {
                 />
               </div>
               {/* <div className="flex justify-between items-center">
-            <Label
-              htmlFor="qrCode"
-              className="flex items-center space-x-2 cursor-pointer"
-            >
-              <QrCode className="h-4 w-4 text-primary" />
-              <span>Generate QR Code</span>
-            </Label>
-            <Switch
-              id="qrCode"
-              checked={enableQrCode}
-              onCheckedChange={setEnableQrCode}
-            />
-          </div> */}
-
+                <Label
+                  htmlFor="qrCode"
+                  className="flex items-center space-x-2 cursor-pointer"
+                >
+                  <QrCode className="h-4 w-4 text-primary" />
+                  <span>Generate QR Code</span>
+                </Label>
+                <Switch
+                  id="qrCode"
+                  checked={enableQrCode}
+                  onCheckedChange={setEnableQrCode}
+                />
+              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="domain" className="flex items-center space-x-2">
                   <Globe className="h-4 w-4 text-primary" />
@@ -529,12 +528,12 @@ export default function LinkShortener() {
               ) : (
                 urlHistory.map((url) => (
                   <Card key={url.id} className="bg-secondary">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <div className="space-y-1">
-                        <CardTitle className="text-lg font-medium text-primary">
+                    <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 pb-2">
+                      <div className="space-y-1 w-full md:w-auto">
+                        <CardTitle className="text-lg font-medium text-primary break-words">
                           {url.short_url}
                         </CardTitle>
-                        <CardDescription className="text-sm text-muted-foreground">
+                        <CardDescription className="text-sm text-muted-foreground break-words">
                           {url.original_url}
                         </CardDescription>
                         {url.expires_at && (
@@ -544,10 +543,10 @@ export default function LinkShortener() {
                           </CardDescription>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <div className="flex items-center justify-center h-9 w-9 pr-4">
+                            <div className="flex items-center justify-center">
                               <Switch
                                 checked={url.enabled}
                                 onCheckedChange={(newStatus) =>
@@ -613,16 +612,16 @@ export default function LinkShortener() {
     ),
     [
       activeTab,
-      setActiveTab,
       betterHandleSubmit,
       longUrl,
+      customSlug,
       selectedDomain,
       expiryDate,
+      isLoading,
       urlHistory,
       toggleLinkStatus,
       copyLink,
       handleDeleteClick,
-      isLoading,
     ]
   );
 
