@@ -32,6 +32,14 @@ export default function RootLayout({
         {children}
         {process.env.NODE_ENV === "development" && <IconDock />}
         <Toaster richColors />
+        <footer className="text-center text-sm text-muted-foreground py-4 fixed bottom-0 left-0 right-0">
+          <p>
+            Made with ❤️ by{" "}
+            <a href="https://x.com/arctixdev" target="_blank" className="hover:underline">
+              @arctixdev
+            </a>
+          </p>
+        </footer>
       </body>
     </html>
   );
