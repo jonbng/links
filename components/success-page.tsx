@@ -28,6 +28,7 @@ export default function SuccessPage({
   onViewStats,
 }: SuccessPageProps) {
   const [copied, setCopied] = useState(false);
+  const isShorter = shortUrl.length < originalUrl.length;
 
   const memoizedCard = useMemo(() => {
     const copyToClipboard = () => {
@@ -55,6 +56,11 @@ export default function SuccessPage({
               <p className="text-sm text-muted-foreground mt-1">
                 {originalUrl}
               </p>
+              {!isShorter && (
+                <p className="text-sm text-red-500 mt-1">
+                  Warning: The short link is longer than the original URL.
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <Button
@@ -87,7 +93,7 @@ export default function SuccessPage({
         </CardContent>
       </Card>
     );
-  }, [shortUrl, originalUrl, onCreateAnother, onViewStats, copied]);
+  }, [shortUrl, originalUrl, isShorter, copied, onCreateAnother, onViewStats]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
