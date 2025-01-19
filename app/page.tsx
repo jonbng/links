@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import {
-  QrCode,
   Globe,
   CalendarIcon,
   Clipboard,
@@ -73,7 +72,6 @@ export interface ClickData {
 export default function LinkShortener() {
   const [longUrl, setLongUrl] = useState("");
   const [customSlug, setCustomSlug] = useState("");
-  const [enableQrCode, setEnableQrCode] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState("alfabeta.dk");
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("shorten");
@@ -211,7 +209,6 @@ export default function LinkShortener() {
       console.log({
         longUrl,
         customSlug,
-        enableQrCode,
         selectedDomain,
         expiryDate,
       });
@@ -247,7 +244,6 @@ export default function LinkShortener() {
     [
       longUrl,
       customSlug,
-      enableQrCode,
       selectedDomain,
       expiryDate,
       supabase,
@@ -317,7 +313,6 @@ export default function LinkShortener() {
     console.log("Creating another link");
     setLongUrl("");
     setCustomSlug("");
-    setEnableQrCode(false);
     setSelectedDomain("alfabeta.dk");
     setExpiryDate(undefined);
     setIsSubmitted(false); // Reset the submission state
@@ -425,20 +420,6 @@ export default function LinkShortener() {
                   </Tooltip>
                 </div>
               </div>
-              {/* <div className="flex justify-between items-center">
-                <Label
-                  htmlFor="qrCode"
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <QrCode className="h-4 w-4 text-primary" />
-                  <span>Generate QR Code</span>
-                </Label>
-                <Switch
-                  id="qrCode"
-                  checked={enableQrCode}
-                  onCheckedChange={setEnableQrCode}
-                />
-              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="domain" className="flex items-center space-x-2">
                   <Globe className="h-4 w-4 text-primary" />
@@ -484,7 +465,6 @@ export default function LinkShortener() {
                   />
                 </div>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="expiry" className="flex items-center space-x-2">
                   <CalendarIcon className="h-4 w-4 text-primary" />
@@ -551,12 +531,15 @@ export default function LinkShortener() {
                         <CardDescription className="text-sm text-muted-foreground break-words">
                           {url.original_url}
                         </CardDescription>
-                        {url.expires_at && (
                           <CardDescription className="text-sm text-muted-foreground">
+                          {url.expires_at ? (
+                            <>
                             Expires on:{" "}
-                            {format(new Date(url.expires_at), "PPP")}
+                          {format(new Date(url.expires_at), "PPP")}
+                            </>
+                          ) : "No expiry date set"
+                          }
                           </CardDescription>
-                        )}
                       </div>
                       <div className="flex items-center gap-2 w-full md:w-auto justify-end">
                         <Tooltip>
@@ -625,20 +608,7 @@ export default function LinkShortener() {
         </Tabs>
       </TooltipProvider>
     ),
-    [
-      activeTab,
-      betterHandleSubmit,
-      longUrl,
-      selectedDomain,
-      isFocused,
-      customSlug,
-      expiryDate,
-      isLoading,
-      urlHistory,
-      toggleLinkStatus,
-      copyLink,
-      handleDeleteClick,
-    ]
+    [activeTab, betterHandleSubmit, longUrl, selectedDomain, isFocused, customSlug, expiryDate, isLoading, urlHistory, toggleLinkStatus, copyLink, handleDeleteClick]
   );
 
   const renderedContent = useMemo(
