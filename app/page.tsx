@@ -204,12 +204,6 @@ export default function LinkShortener() {
     [supabase, urlHistory]
   );
 
-  const betterHandleSubmit = async (e: React.FormEvent) => {
-    setIsLoading(true);
-    await handleSubmit(e);
-    setIsLoading(false);
-  };
-
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -296,6 +290,15 @@ export default function LinkShortener() {
       );
     },
     [supabase]
+  );
+
+  const betterHandleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      setIsLoading(true);
+      await handleSubmit(e);
+      setIsLoading(false);
+    },
+    [handleSubmit]
   );
 
   const copyLink = useMemo(
