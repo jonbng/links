@@ -42,6 +42,7 @@ import {
   Clipboard,
   Trash2,
   Copy,
+  Link,
 } from "lucide-react";
 import { LinkStatsChart } from "@/components/link-stats-chart";
 import { Loader } from "@/components/ui/loader";
@@ -80,6 +81,7 @@ export default function LinkShortener() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [linkToDelete, setLinkToDelete] = useState<number | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   interface UrlHistory {
     id: number;
@@ -385,7 +387,13 @@ export default function LinkShortener() {
               </h1>
 
               <div className="space-y-2">
-                <Label htmlFor="longUrl">Enter your long URL</Label>
+                <Label
+                  htmlFor="longUrl"
+                  className="flex items-center space-x-2"
+                >
+                  <Link className="h-4 w-4 text-primary" />
+                  <span>Destination URL</span>
+                </Label>
                 <div className="flex">
                   <Input
                     id="longUrl"
@@ -414,24 +422,6 @@ export default function LinkShortener() {
                   </Tooltip>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="customSlug"
-                  className="flex items-center space-x-2"
-                >
-                  <span>Custom short link</span>
-                  <span className="text-sm text-muted-foreground">
-                    (optional)
-                  </span>
-                </Label>
-                <Input
-                  id="customSlug"
-                  type="text"
-                  placeholder="e.g., my-custom-link"
-                  value={customSlug}
-                  onChange={(e) => setCustomSlug(e.target.value)}
-                />
-              </div>
               {/* <div className="flex justify-between items-center">
                 <Label
                   htmlFor="qrCode"
@@ -449,25 +439,47 @@ export default function LinkShortener() {
               <div className="space-y-2">
                 <Label htmlFor="domain" className="flex items-center space-x-2">
                   <Globe className="h-4 w-4 text-primary" />
-                  <span>Select Domain</span>
+                  <span>Select Short Link</span>
                 </Label>
-                <Select
-                  value={selectedDomain}
-                  onValueChange={setSelectedDomain}
-                >
-                  <SelectTrigger id="domain" aria-label="Select a domain">
-                    <SelectValue placeholder="Select a domain" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="whatup.dk">whatup.dk</SelectItem>
-                    <SelectItem value="fedtnok.dk">fedtnok.dk</SelectItem>
-                    <SelectItem value="alfabeta.dk">alfabeta.dk</SelectItem>
-                    <SelectItem value="jonathanb.dk">jonathanb.dk</SelectItem>
-                    <SelectItem value="links.arctix.dev">
-                      links.arctix.dev
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-0">
+                  <Select
+                    value={selectedDomain}
+                    onValueChange={setSelectedDomain}
+                  >
+                    <SelectTrigger
+                      id="domain"
+                      aria-label="Select a domain"
+                      className={cn("rounded-r-none w-1/4", {
+                        "ring-2 ring-ring ring-offset-2": isFocused,
+                      })}
+                      onFocus={() => setIsFocused(true)}
+                      onBlur={() => setIsFocused(false)}
+                    >
+                      <SelectValue placeholder="Select a domain" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="whatup.dk">whatup.dk</SelectItem>
+                      <SelectItem value="fedtnok.dk">fedtnok.dk</SelectItem>
+                      <SelectItem value="alfabeta.dk">alfabeta.dk</SelectItem>
+                      <SelectItem value="jonathanb.dk">jonathanb.dk</SelectItem>
+                      <SelectItem value="links.arctix.dev">
+                        links.arctix.dev
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="customSlug"
+                    type="text"
+                    placeholder="(optional)"
+                    className={cn("rounded-l-none border-l-0", {
+                      "ring-2 ring-ring ring-offset-2": isFocused,
+                    })}
+                    value={customSlug}
+                    onChange={(e) => setCustomSlug(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -614,8 +626,9 @@ export default function LinkShortener() {
       activeTab,
       betterHandleSubmit,
       longUrl,
-      customSlug,
       selectedDomain,
+      isFocused,
+      customSlug,
       expiryDate,
       isLoading,
       urlHistory,
