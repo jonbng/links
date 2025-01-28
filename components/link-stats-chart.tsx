@@ -131,13 +131,13 @@ export function LinkStatsChart({
                           <div className="text-sm">
                             Desktop:{" "}
                             <span className="font-bold">
-                              {payload[0].value}
+                              {payload[1].value}
                             </span>
                           </div>
                           <div className="text-sm">
                             Mobile:{" "}
                             <span className="font-bold">
-                              {payload[1].value}
+                              {payload[0].value}
                             </span>
                           </div>
                         </div>
