@@ -32,8 +32,22 @@ export const metadata: Metadata = {
         alt: "Alfa Beta",
       }
     ]
-
-  }
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://alfabeta.dk",
+    title: "Alfa Beta",
+    description: "The only link shortener you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
+    siteName: "Alfa Beta",
+    emails: "contact@alfabeta.dk",
+    images: [
+      {
+        url: "https://alfabeta.dk/og-image.png",
+        alt: "Alfa Beta",
+      }
+    ],
+  },
 };
 
 export default function RootLayout({
