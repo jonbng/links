@@ -10,7 +10,30 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Alfa Beta",
   description:
-    "The only online toolbox you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
+    "The only link shortener you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
+  applicationName: "Alfa Beta",
+  themeColor: "#FFFFFF",
+  colorScheme: "light",
+  creator: "Jonathan Bangert",
+  publisher: "Jonathan Bangert",
+  keywords: ["toolbox", "alfa", "beta", "arctixdev"],
+  viewport: "width=device-width, initial-scale=1.0",
+  twitter: {
+    site: "@arctixdev",
+    creator: "@arctixdev",
+    card: "summary_large_image",
+    creatorId: "arctixdev",
+    description: "The only link shortener you'll ever need. Feature rich and minimalistic. - Made with ❤️ by @arctixdev.",
+    siteId: "arctixdev",
+    title: "Alfa Beta",
+    images: [
+      {
+        url: "https://alfabeta.dk/og-image.png",
+        alt: "Alfa Beta",
+      }
+    ]
+
+  }
 };
 
 export default function RootLayout({
