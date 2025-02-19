@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 import { createAdminClient } from "./utils/supabase/admin";
 
@@ -14,7 +14,9 @@ async function redirectMiddleware(request: NextRequest) {
   console.log(data, error)
 
   if (!error && data) {
-    await supabase.from("clicks").insert([{ link_id: data.id, is_mobile: request.headers.get("user-agent")?.includes("Mobile"), referrer: request.headers.get("referer"), user_agent: request.headers.get("user-agent"), os: request.headers.get("user-agent")?.split(") ")[0].split("; ").pop() }])
+    after(async () => {
+      await supabase.from("clicks").insert([{ link_id: data.id, is_mobile: request.headers.get("user-agent")?.includes("Mobile"), referrer: request.headers.get("referer"), user_agent: request.headers.get("user-agent"), os: request.headers.get("user-agent")?.split(") ")[0].split("; ").pop(), ip: request.headers.get("cf-connecting-ip") }])
+    })
     return Response.redirect(data.original_url)
   } else {
     return Response.redirect(`https://alfabeta.dk/`)
